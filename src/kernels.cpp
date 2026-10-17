@@ -15,6 +15,10 @@
 #define VERBO_AVX2 1
 #endif
 
+#if !defined(VERBO_NEON) && defined(__F16C__)
+#include <immintrin.h>
+#endif
+
 namespace verbo {
 
 std::size_t Tensor::row_bytes() const {
