@@ -1,0 +1,83 @@
+[
+  {
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "quant": "f32",
+    "file_mb": 540,
+    "pp": 198.1,
+    "tg": 75.8,
+    "rss_mb": 599.0,
+    "threads": 4
+  },
+  {
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "quant": "q8",
+    "file_mb": 145,
+    "pp": 1460.9,
+    "tg": 208.3,
+    "rss_mb": 205.0,
+    "threads": 4
+  },
+  {
+    "model": "HuggingFaceTB/SmolLM2-135M-Instruct",
+    "quant": "q4",
+    "file_mb": 114,
+    "pp": 1463.1,
+    "tg": 230.8,
+    "rss_mb": 173.0,
+    "threads": 4
+  },
+  {
+    "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    "quant": "f32",
+    "file_mb": 1449,
+    "pp": 73.0,
+    "tg": 28.8,
+    "rss_mb": 1534.0,
+    "threads": 4
+  },
+  {
+    "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    "quant": "q8",
+    "file_mb": 387,
+    "pp": 462.2,
+    "tg": 77.5,
+    "rss_mb": 472.0,
+    "threads": 4
+  },
+  {
+    "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    "quant": "q4",
+    "file_mb": 293,
+    "pp": 480.8,
+    "tg": 87.8,
+    "rss_mb": 379.0,
+    "threads": 4
+  },
+  {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "quant": "f32",
+    "file_mb": 1983,
+    "pp": 65.8,
+    "tg": 21.3,
+    "rss_mb": 2082.0,
+    "threads": 4
+  },
+  {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "quant": "q8",
+    "file_mb": 532,
+    "pp": 496.0,
+    "tg": 64.9,
+    "rss_mb": 631.0,
+    "threads": 4
+  },
+  {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "quant": "q4",
+    "file_mb": 418,
+    "pp": 568.4,
+    "tg": 79.9,
+    "rss_mb": 517.0,
+    "threads": 4
+  }
+]

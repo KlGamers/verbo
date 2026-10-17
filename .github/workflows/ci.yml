@@ -1,0 +1,65 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  core:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - run: cmake -S . -B build -DVERBO_SANITIZE=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - run: cmake --build build -j
+      - run: ctest --test-dir build --output-on-failure
+        env:
+          ASAN_OPTIONS: detect_container_overflow=0
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+      - run: cmake -S . -B build-scalar -DVERBO_SCALAR=ON -DCMAKE_BUILD_TYPE=Release && cmake --build build-scalar -j
+      - run: ctest --test-dir build-scalar --output-on-failure
+
+  python:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "./python[dev]"
+      - working-directory: python/tests
+        run: python -m pytest -q .
+
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-smollm2-135m-qwen25-tok-v1
+      - run: pip install torch --index-url https://download.pytorch.org/whl/cpu && pip install transformers tokenizers safetensors huggingface_hub numpy
+      - run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j
+      - name: corpus
+        run: |
+          mkdir -p corpus
+          for l in es en zh ar ru hi; do curl -sL -o corpus/xquad.$l.json https://raw.githubusercontent.com/google-deepmind/xquad/master/xquad.$l.json; done
+          python tools/corpus.py --xquad corpus --code src --code tools --fuzz 20000 --out corpus/parity.jsonl
+      - name: models
+        run: |
+          python -c "from huggingface_hub import snapshot_download as d; print(d('HuggingFaceTB/SmolLM2-135M-Instruct', allow_patterns=['*.json','*.safetensors']))" > smol.txt
+          python -c "from huggingface_hub import hf_hub_download as d; print(d('Qwen/Qwen2.5-0.5B-Instruct', 'tokenizer.json'))" > qwen.txt
+      - run: python tools/tok_parity.py "$(cat smol.txt)/tokenizer.json" corpus/parity.jsonl --bin build/tokdump
+      - run: python tools/tok_parity.py "$(cat qwen.txt)" corpus/parity.jsonl --bin build/tokdump --max-rate 0.0005
+      - run: python tools/parity.py "$(cat smol.txt)" --check
